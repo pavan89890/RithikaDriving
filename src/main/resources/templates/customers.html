@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{decorator}">
+
+<head>
+<!-- DataTables -->
+<link rel="stylesheet"
+	th:href="@{/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css}">
+<link
+	th:href="@{/bower_components/datatables.net-bs/css/buttons.dataTables.min.css}"
+	rel="stylesheet">
+</head>
+
+<body>
+	<!-- /.row -->
+	<div layout:fragment="page_content" id="page_content">
+		<section class="content-header">
+			<h1>
+				Customers <small>(add,update,delete)</small>
+			</h1>
+		</section>
+
+		<!-- Main content -->
+		<section class="content container-fluid">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="box box-success">
+						<div class="box-header with-border">
+							Customers
+							<button class="btn btn-success btn-xs pull-right" id="addBtnId"
+								data-toggle="modal" data-target="#customerPopupId"
+								onclick="updateRecord(0);">Add</button>
+						</div>
+						<div class="box-body">
+							<div class="table-responsive">
+								<table id="customersTable"
+									class="table table-bordered table-striped">
+									<thead>
+										<tr>
+											<th>S.No</th>
+											<th>Name</th>
+											<th>Care Of</th>
+											<th>Age</th>
+											<th>Gender</th>
+											<th>Address</th>
+											<th>Phone</th>
+											<th>Admission Date</th>
+											<th>Total Fee</th>
+											<th>Fee Paid</th>
+											<th>Balance</th>
+											<th>Status</th>
+											<th></th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr th:each="customer,status:${customers}">
+											<td th:text="${status.index+1}"></td>
+											<td th:text="${customer.name}"></td>
+											<td th:text="${customer.careOf}"></td>
+											<td th:text="${customer.age}"></td>
+											<td th:text="${customer.gender}"></td>
+											<td th:text="${customer.address}"></td>
+											<td th:text="${customer.phone}"></td>
+											<td
+												th:text="${#dates.format(customer.admissionDate,'dd-MM-yyyy')}"></td>
+											<td th:text="${customer.totalFee}"></td>
+											<td th:text="${customer.feePaid}"></td>
+											<td th:text="${customer.balance}"></td>
+											<td th:text="${customer.status}"></td>
+											<td style="white-space: nowrap;">
+												<button class="btn btn-info btn-xs" title="Update"
+													th:onclick="${'javascript:updateRecord('+customer.id+')'}">
+													<i class="fa fa-edit"></i>
+												</button>
+												<button title="Delete"
+													th:onclick="${'javascript:deleteRecord('+customer.id+')'}"
+													class="btn btn-danger btn-xs">
+													<i class="fa fa-trash"></i>
+												</button>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<div class="modal fade" id="customerPopupId">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title">Customers</h4>
+					</div>
+					<div class="modal-body" id="customerPopupBodyId">
+						<!-- <div th:replace="/customerPopup:: customerPopup"></div> -->
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default pull-left"
+							data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-success"
+							onclick="saveCustomer()">Save</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal-dialog -->
+		</div>
+	</div>
+
+	<th:block layout:fragment="scripts">
+		<!-- DataTables -->
+		<script
+			th:src="@{/bower_components/datatables.net/js/jquery.dataTables.min.js}"></script>
+		<script
+			th:src="@{/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js}"></script>
+		<script
+			th:src="@{/bower_components/datatables.net/js/dataTables.buttons.min.js}"></script>
+		<script th:src="@{/bower_components/datatables.net/js/jszip.min.js}"></script>
+		<script th:src="@{/bower_components/datatables.net/js/pdfmake.min.js}"></script>
+		<script th:src="@{/bower_components/datatables.net/js/vfs_fonts.js}"></script>
+		<script
+			th:src="@{/bower_components/datatables.net/js/buttons.html5.min.js}"></script>
+		<script type="text/javascript">
+			function saveCustomer() {
+				if ($("#name").val().trim() == "") {
+					alert("Please Enter Name");
+					$("#name").focus();
+					return false;
+				} else if ($("#gender").val().trim() == "") {
+					alert("Please Select Gender");
+					$("#gender").focus();
+					return false;
+				} else if ($("#phone").val().trim() == "") {
+					alert("Please Enter Phone");
+					$("#phone").focus();
+					return false;
+				} else if ($("#admissionDate").val().trim() == "") {
+					alert("Please Select Admission Date");
+					$("#admissionDate").focus();
+					return false;
+				} else if ($("#status").val().trim() == "") {
+					alert("Please Select Status");
+					$("#status").focus();
+					return false;
+				} else if (!$("#totalFee").val().trim() == ""
+						&& !$("#feePaid").val().trim() == ""
+						&& $("#totalFee").val().trim() < $("#feePaid").val()
+								.trim()) {
+					alert("Total Fee Should Not Less Than Fee Paid");
+					$("#feePaid").focus();
+					return false;
+				} else {
+					$.ajax({
+						url : $("#customerFormId").attr("action"),
+						type : 'post',
+						data : $("#customerFormId").serialize(),
+						success : function(data) {
+							if (data.split("-")[0] == "SUCCESS") {
+								alert(data.split("-")[1]);
+								$("#customerFormId")[0].reset();
+								window.location.reload();
+							} else {
+								alert(data.split("-")[1], "error");
+							}
+
+						},
+						error : function() {
+							alert("Unable to load details.");
+						}
+					});
+					return true;
+				}
+			}
+
+			$(document)
+					.ready(
+							function() {
+								$('#customersTable')
+										.DataTable(
+												{
+													dom : 'Blfrtip',
+													buttons : [
+															{
+																extend : 'excelHtml5',
+																text : '<i class="fa fa-file-excel-o" style="color:#1e7145;"></i>',
+																titleAttr : 'Excel'
+															},
+															{
+																extend : 'pdfHtml5',
+																text : '<i class="fa fa-file-pdf-o" style="color:#cb0606;"></i>',
+																titleAttr : 'PDF'
+															} ]
+												});
+								$("#addBtnId").click(function() {
+									$("#customerFormId")[0].reset();
+								});
+							});
+
+			function updateRecord(id) {
+				$.ajax({
+					url : '/rithika/admin/updateCustomer?u=' + id,
+					type : 'get',
+					success : function(data) {
+						$("#customerPopupBodyId").html(data);
+						$("#customerPopupId").modal(true);
+					},
+					error : function() {
+						alert("Unable to load details.");
+					}
+				});
+			}
+
+			function deleteRecord(id) {
+				if (confirm("Are you sure you want to delete?")) {
+					window.location = "/rithika/admin/deleteCustomer?u=" + id;
+				}
+			}
+		</script>
+	</th:block>
+</body>
+
+</html>

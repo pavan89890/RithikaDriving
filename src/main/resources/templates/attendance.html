@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{decorator}">
+
+<head>
+<!-- DataTables -->
+<link rel="stylesheet"
+	th:href="@{/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css}">
+<link
+	th:href="@{/bower_components/datatables.net-bs/css/buttons.dataTables.min.css}"
+	rel="stylesheet">
+</head>
+
+<body>
+	<!-- /.row -->
+	<div layout:fragment="page_content" id="page_content">
+		<section class="content-header">
+			<h1>
+				Customer Attendance <small></small>
+			</h1>
+		</section>
+
+		<!-- Main content -->
+		<section class="content container-fluid">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="box box-success">
+						<div class="box-header with-border">
+							<div class="row">
+								<div class="col-md-4">
+									<div class="form-group">
+										<label for="customer">Customer</label> <select
+											class="form-control" id="customer" name="customer"
+											onchange="getCustomerAttendance(this.value)">
+											<option value="">Select Customer</option>
+											<th:block th:each="customer:${customers}">
+												<option th:value="${customer.id}" th:text="${customer.name}"></option>
+											</th:block>
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="box-body">
+							<div id="cusAtdDetails"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<div class="modal fade" id="cusAttPopupId">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title">Customer Attendance</h4>
+					</div>
+					<div class="modal-body" id="cusAttPopupBodyId">
+						<!-- <div th:replace="/customerPopup:: customerPopup"></div> -->
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default pull-left"
+							data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-success"
+							onclick="saveCustomerAttendance()">Save</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal-dialog -->
+		</div>
+	</div>
+
+	<th:block layout:fragment="scripts">
+		<!-- DataTables -->
+		<script
+			th:src="@{/bower_components/datatables.net/js/jquery.dataTables.min.js}"></script>
+		<script
+			th:src="@{/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js}"></script>
+		<script
+			th:src="@{/bower_components/datatables.net/js/dataTables.buttons.min.js}"></script>
+		<script th:src="@{/bower_components/datatables.net/js/jszip.min.js}"></script>
+		<script th:src="@{/bower_components/datatables.net/js/pdfmake.min.js}"></script>
+		<script th:src="@{/bower_components/datatables.net/js/vfs_fonts.js}"></script>
+		<script
+			th:src="@{/bower_components/datatables.net/js/buttons.html5.min.js}"></script>
+		<script type="text/javascript">
+			function saveCustomerAttendance() {
+				if ($("#classDate").val().trim() == "") {
+					alert("Please Select Class Date");
+					$("#classDate").focus();
+					return false;
+				} else if ($("#inTime").val().trim() == "") {
+					alert("Please Select In Time");
+					$("#inTime").focus();
+					return false;
+				} else if ($("#outTime").val().trim() == "") {
+					alert("Please Select Out Time");
+					$("#outTime").focus();
+					return false;
+				} else {
+					$.ajax({
+						url : $("#customerAttendanceFormId").attr("action"),
+						type : 'post',
+						data : $("#customerAttendanceFormId").serialize(),
+						success : function(data) {
+							if (data.split("-")[0] == "SUCCESS") {
+								alert(data.split("-")[1]);
+								$("#customerAttendanceFormId")[0].reset();
+								window.location.reload();
+							} else {
+								alert(data.split("-")[1], "error");
+							}
+
+						},
+						error : function() {
+							alert("Unable to load details.");
+						}
+					});
+					return true;
+				}
+			}
+
+			function attendance(id) {
+				$.ajax({
+					url : '/rithika/admin/customerAttendancePopup?u=' + id
+							+ '&c=' + $("#customer").val(),
+					type : 'get',
+					success : function(data) {
+						$("#cusAttPopupBodyId").html(data);
+						$("#cusAttPopupId").modal(true);
+					},
+					error : function() {
+						alert("Unable to load details.");
+					}
+				});
+			}
+
+			function getCustomerAttendance(customerId) {
+				if (customerId != "") {
+					$.ajax({
+						url : '/rithika/admin/customerAttendance?customer='
+								+ customerId,
+						type : 'get',
+						success : function(data) {
+							$("#cusAtdDetails").html(data);
+						},
+						error : function() {
+							alert("Unable to load details.");
+						}
+					});
+				} else {
+					$("#cusAtdDetails").html("");
+				}
+			}
+			
+			function deleteRecord(id) {
+				if (confirm("Are you sure you want to delete?")) {
+					window.location = "/rithika/admin/deleteCustomerAttendance?u=" + id;
+				}
+			}
+		</script>
+	</th:block>
+</body>
+</html>

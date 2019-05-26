@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<link rel="stylesheet"
+	th:href="@{/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css}">
+</head>
+<body>
+	<!-- /.row -->
+	<div th:fragment="userPopup" id="page_content">
+		<form role="form" action="/rithika/admin/saveCustomer" method="post"
+			id="customerFormId">
+			<input type="hidden" name="id" th:value="${customer.id}">
+			<div class="box-body">
+				<div class="form-group">
+					<label for="name">Name</label> <input name="name"
+						class="form-control" id="name" placeholder="Enter Name"
+						th:value="${customer.name}" type="text">
+				</div>
+				<div class="form-group">
+					<label for="careOf">Care Of</label> <input class="form-control"
+						th:value="${customer.careOf}" id="careOf" name="careOf"
+						placeholder="Enter Care Of" type="text">
+				</div>
+				<div class="form-group">
+					<label for="address">Address</label> <input type="text"
+						name="address" id="address" class="form-control"
+						th:value="${customer.address}" placeholder="Enter Address" />
+				</div>
+				<div class="row">
+					<div class="col-md-4">
+						<div class="form-group">
+							<label for="gender">Gender</label> <select class="form-control"
+								name="gender" id="gender"><option value="">Select
+									Gender</option>
+								<option value="MALE" th:selected="(${customer.gender=='MALE'})">MALE</option>
+								<option value="FEMALE"
+									th:selected="(${customer.gender=='FEMALE'})">FEMALE</option></select>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
+							<label for="age">Age</label> <input class="form-control number"
+								th:value="${customer.age}" id="age" name="age"
+								placeholder="Enter Age" type="text"  maxlength="2">
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
+							<label for="phone">Phone</label> <input
+								class="form-control number" th:value="${customer.phone}"
+								id="phone" name="phone" placeholder="Enter Phone" type="text" maxlength="20">
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-4">
+						<div class="form-group">
+							<label for="totalFee">Total Fee</label> <input
+								class="form-control number" th:value="${customer.totalFee}"
+								id="totalFee" name="totalFee" placeholder="Enter Total Fee"
+								type="text" maxlength="6">
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
+							<label for="feePaid">Fee Paid</label> <input
+								class="form-control number" th:value="${customer.feePaid}"
+								id="feePaid" name="feePaid" placeholder="Enter Fee Paid"
+								type="text" maxlength="6">
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
+							<label for="balance">Balance</label> <input
+								class="form-control number" th:value="${customer.balance}"
+								id="balance" name="balance" placeholder="Balance" type="text"
+								readonly="readonly" maxlength="6">
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6">
+						<div class="form-group">
+							<label>Admission Date:</label>
+							<div class="input-group date">
+								<div class="input-group-addon">
+									<i class="fa fa-calendar"></i>
+								</div>
+								<input type="text" name="admissionDate"
+									placeholder="Select Admission Date (DD-MM-YYYY)"
+									class="form-control pull-right" id="admissionDate"
+									th:value="${#dates.format(customer.admissionDate,'dd-MM-yyyy')}">
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							<label for="status">Status</label> <select class="form-control"
+								name="status" id="status"><option value="">Select
+									Status</option>
+								<option value="CURRENT"
+									th:selected="(${customer.status=='CURRENT'})">CURRENT</option>
+								<option value="LEFT" th:selected="(${customer.status=='LEFT'})">LEFT</option>
+								<option value="CANCELLED"
+									th:selected="(${customer.status=='CANCELLED'})">CANCELLED</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /.box-body -->
+		</form>
+	</div>
+	<th:block layout:fragment="scripts">
+		<!-- bootstrap datepicker -->
+		<script
+			th:src="@{/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js}"></script>
+		<script type="text/javascript">
+			$('#admissionDate').datepicker({
+				format : "dd-mm-yyyy",
+				autoclose : true,
+				todayHighlight : true,
+			//startDate : '+0d'
+			})
+
+			$(".number").on('keyup mouseleave', function() {
+				if (isNaN($(this).val().trim())) {
+					$(this).val('');
+					alert("Please Enter Numbers Only");
+					$(this).focus();
+				}
+			});
+		</script>
+	</th:block>
+</body>
+</html>

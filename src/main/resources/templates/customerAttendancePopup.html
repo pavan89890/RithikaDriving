@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<link rel="stylesheet"
+	th:href="@{/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css}">
+<link rel="stylesheet"
+	th:href="@{/plugins/timepicker/bootstrap-timepicker.min.css}">
+</head>
+<body>
+	<!-- /.row -->
+	<div th:fragment="userPopup" id="page_content">
+		<form role="form" action="/rithika/admin/saveCustomerAttendance"
+			method="post" id="customerAttendanceFormId">
+			<input type="hidden" name="id" th:value="${customerAttendance.id}">
+			<input type="hidden" name="customer" th:value="${customer.id}">
+			<div class="box-body">
+				<div class="form-group">
+					<label for="name">Name</label> <input class="form-control"
+						id="name" placeholder="Enter Name"
+						th:value="${customer!=null?customer.name:''}" type="text"
+						readonly="readonly">
+				</div>
+				<div class="row">
+					<div class="col-md-4">
+						<div class="form-group">
+							<label>Class Date:</label>
+							<div class="input-group date">
+								<div class="input-group-addon">
+									<i class="fa fa-calendar"></i>
+								</div>
+								<input type="text" name="classDate"
+									placeholder="Select Class Date (DD-MM-YYYY)"
+									th:value="${#dates.format(customerAttendance.classDate,'dd-MM-yyyy')}"
+									class="form-control pull-right" id="classDate">
+							</div>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
+							<label>In Time</label>
+							<div class="input-group">
+								<input type="text" class="form-control timepicker" id="inTime"
+									name="inTime" th:value="${customerAttendance.inTime}">
+								<div class="input-group-addon">
+									<i class="fa fa-clock-o"></i>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
+							<label>Out Time</label>
+							<div class="input-group">
+								<input type="text" class="form-control timepicker" id="outTime"
+									th:value="${customerAttendance.outTime}" name="outTime">
+								<div class="input-group-addon">
+									<i class="fa fa-clock-o"></i>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /.box-body -->
+		</form>
+	</div>
+	<th:block layout:fragment="scripts">
+		<!-- bootstrap datepicker -->
+		<script
+			th:src="@{/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js}"></script>
+		<script th:src="@{/plugins/timepicker/bootstrap-timepicker.min.js}"></script>
+		<script type="text/javascript">
+			$('#classDate').datepicker({
+				format : "dd-mm-yyyy",
+				autoclose : true,
+				todayHighlight : true,
+			//startDate : '+0d'
+			})
+
+			//Timepicker
+			$('.timepicker').timepicker({
+				showInputs : false
+			})
+		</script>
+	</th:block>
+</body>
+</html>

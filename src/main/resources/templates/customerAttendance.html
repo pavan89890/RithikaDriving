@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+</head>
+<body>
+	<!-- /.row -->
+	<div class="row">
+		<div class="col-md-12">
+			<button class="btn btn-success btn-xs pull-right" id="addBtnId"
+				data-toggle="modal" data-target="#modal-default"
+				onclick="attendance(0)"
+				th:if="${customer.customerAttendance!=null && customer.customerAttendance.size()<30}">Add</button>
+		</div>
+	</div>
+	<br>
+	<div class="row">
+		<div class="col-md-12">
+			<div class="table-responsive"
+				th:if="${customer.customerAttendance!=null}">
+				<table id="customersTable"
+					class="table table-bordered table-striped">
+					<thead>
+						<tr>
+							<th>S.No</th>
+							<th>Name</th>
+							<th>Date</th>
+							<th>In Time</th>
+							<th>Out Time</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="cusAtd,status:${customer.customerAttendance}">
+							<td th:text="${status.index+1}"></td>
+							<td th:text="${customer.name}"></td>
+							<td th:text="${#dates.format(cusAtd.classDate,'dd-MM-yyyy')}"></td>
+							<td th:text="${cusAtd.inTime}"></td>
+							<td th:text="${cusAtd.outTime}"></td>
+							<td style="white-space: nowrap;">
+								<button title="Edit"
+									th:onclick="${'javascript:attendance('+cusAtd.id+')'}"
+									class="btn btn-info btn-xs">
+									<i class="fa fa-edit"></i>
+								</button>
+								<button title="Delete"
+									th:onclick="${'javascript:deleteRecord('+cusAtd.id+')'}"
+									class="btn btn-danger btn-xs">
+									<i class="fa fa-trash"></i>
+								</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<th:block layout:fragment="scripts">
+		<script>
+			$(document)
+					.ready(
+							function() {
+								$('#customersTable')
+										.DataTable(
+												{
+													dom : 'Blfrtip',
+													buttons : [
+															{
+																extend : 'excelHtml5',
+																text : '<i class="fa fa-file-excel-o" style="color:#1e7145;"></i>',
+																titleAttr : 'Excel'
+															},
+															{
+																extend : 'pdfHtml5',
+																text : '<i class="fa fa-file-pdf-o" style="color:#cb0606;"></i>',
+																titleAttr : 'PDF'
+															} ]
+												});
+							});
+		</script>
+	</th:block>
+</body>
+</html>
